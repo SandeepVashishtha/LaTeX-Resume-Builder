@@ -1,69 +1,56 @@
-// frontend/src/pages/Dashboard.js
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
+// src/pages/Dashboard.js
+import React, { useState } from 'react';
 import MonacoEditor from '@monaco-editor/react';
+import { saveAs } from 'file-saver';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs; // Set the fonts for pdfmake
 
 const Dashboard = () => {
-    const [resumes, setResumes] = useState([]);
-    const [currentResume, setCurrentResume] = useState('');
-    const ws = useRef(null);
+    const [latexCode, setLatexCode] = useState('');
 
-    useEffect(() => {
-        ws.current = new WebSocket('ws://localhost:8080');
-        ws.current.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-            if (message.type === 'UPDATE_RESUME' && message.resume._id === currentResume._id) {
-                setCurrentResume({ ...currentResume, content: message.resume.content });
-            }
+    // Function to handle the PDF generation and download
+    const handleDownloadPdf = () => {
+        const docDefinition = {
+            content: [
+                {
+                    text: latexCode, // Add your LaTeX code here
+                    margin: [0, 0, 0, 20]
+                }
+            ]
         };
 
-        const fetchResumes = async () => {
-            const res = await axios.get('/api/resumes', {
-                headers: { 'x-auth-token': localStorage.getItem('token') }
-            });
-            setResumes(res.data);
-        };
-        fetchResumes();
-    }, [currentResume]);
-
-    const createResume = async () => {
-        const res = await axios.post(
-            '/api/resumes',
-            { title: 'New Resume', content: '' },
-            { headers: { 'x-auth-token': localStorage.getItem('token') } }
-        );
-        setResumes([...resumes, res.data]);
+        pdfMake.createPdf(docDefinition).download('resume.pdf');
     };
 
-    const saveResume = async (id, content) => {
-        await axios.put(
-            `/api/resumes/${id}`,
-            { content },
-            { headers: { 'x-auth-token': localStorage.getItem('token') } }
-        );
-        ws.current.send(JSON.stringify({ type: 'UPDATE_RESUME', resume: { _id: id, content } }));
+    // Function to render LaTeX code to HTML
+    const renderLatex = (code) => {
+        try {
+            return katex.renderToString(code, { throwOnError: false });
+        } catch (e) {
+            return '';
+        }
     };
 
     return (
-        <div>
-            <h1>Dashboard</h1>
-            <button onClick={createResume}>Create Resume</button>
-            <ul>
-                {resumes.map((resume) => (
-                    <li key={resume._id} onClick={() => setCurrentResume(resume)}>
-                        {resume.title}
-                    </li>
-                ))}
-            </ul>
-            {currentResume && (
+        <div style={{ display: 'flex' }}>
+            <div style={{ flex: 1, padding: '10px' }}>
+                <h1>LaTeX Editor</h1>
                 <MonacoEditor
-                    value={currentResume.content}
-                    onChange={(value) => {
-                        setCurrentResume({ ...currentResume, content: value });
-                        saveResume(currentResume._id, value);
-                    }}
+                    height="80vh"
+                    language="latex"
+                    value={latexCode}
+                    onChange={(value) => setLatexCode(value || '')}
                 />
-            )}
+            </div>
+            <div style={{ flex: 1, padding: '10px' }}>
+                <h1>Preview</h1>
+                <div dangerouslySetInnerHTML={{ __html: renderLatex(latexCode) }} />
+            </div>
+            <button onClick={handleDownloadPdf}>Download PDF</button>
         </div>
     );
 };
