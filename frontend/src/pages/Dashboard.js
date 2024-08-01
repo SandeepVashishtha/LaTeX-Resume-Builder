@@ -1,7 +1,6 @@
 // src/pages/Dashboard.js
 import React, { useState } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { saveAs } from 'file-saver';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import katex from 'katex';
@@ -44,6 +43,7 @@ const Dashboard = () => {
                     language="latex"
                     value={latexCode}
                     onChange={(value) => setLatexCode(value || '')}
+                    theme='vs-dark'
                 />
             </div>
             <div style={{ flex: 1, padding: '10px' }}>
