@@ -15,13 +15,10 @@ const Login = () => {
         email,
         password,
       });
-      // Assuming login is successful if a token is returned
       if (response.data.token) {
-        // Save token to local storage or context (if applicable)
         localStorage.setItem('token', response.data.token);
         alert('Login successful');
-        // Redirect to dashboard or any other page
-        navigate('/dashboard'); // Navigate to the dashboard or any other route
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error during login:', error);
