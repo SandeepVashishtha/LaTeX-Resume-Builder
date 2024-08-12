@@ -1,0 +1,30 @@
+.App {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .header {
+    background-color: #282c34;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .content {
+    display: flex;
+    flex: 1;
+  }
+  
+  .editor-container,
+  .preview-container {
+    flex: 1;
+    padding: 10px;
+  }
+  
+  .editor-container {
+    border-right: 1px solid #ddd;
+  }
+  
+  
