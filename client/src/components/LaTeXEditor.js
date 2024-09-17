@@ -23,4 +23,6 @@ function LaTeXEditor({ latexCode, setLatexCode }) {
   );
 }
 
+
+
 export default LaTeXEditor;
