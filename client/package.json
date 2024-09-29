@@ -5,8 +5,11 @@
   "dependencies": {
     "axios": "^1.7.7",
     "client": "file:",
+    "katex": "^0.16.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-katex": "^3.0.1",
+    "react-latex": "^2.0.0",
     "react-router-dom": "^6.26.2",
     "react-scripts": "5.0.1"
   },
