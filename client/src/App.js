@@ -1,36 +1,25 @@
-  import React, { useState, useEffect } from 'react';
-  import axios from 'axios';
-  import LaTeXEditor from './components/LaTeXEditor';
-  import ResumePreview from './components/ResumePreview';
-  import Header from './components/Header';
-  import './styles/App.css';
-  import { API_URL } from './config';
+import logo from './logo.svg';
+import './App.css';
 
-  function App() {
-    const [latexCode, setLatexCode] = useState('');
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
+}
 
-    useEffect(() => {
-      // Load resume data on component mount
-      axios.get(`${API_URL}/get/latest`)
-        .then(response => setLatexCode(response.data.latexCode))
-        .catch(error => console.error('Error fetching resume:', error));
-    }, []);
-
-    const saveResume = () => {
-      axios.post(`${API_URL}/save`, { latexCode })
-        .then(response => alert('Resume saved!'))
-        .catch(error => console.error('Error saving resume:', error));
-    };
-    return (
-      <div className="App">
-        <Header />
-        <div className="content">
-          <LaTeXEditor latexCode={latexCode} setLatexCode={setLatexCode} />
-          <ResumePreview latexCode={latexCode} />
-        </div>
-        <button onClick={saveResume}>Save Resume</button>
-      </div>
-    );
-  }
-
-  export default App;
+export default App;
