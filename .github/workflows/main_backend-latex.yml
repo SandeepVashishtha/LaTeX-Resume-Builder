@@ -31,6 +31,9 @@ jobs:
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
+      - name: Install Mocha
+        run: npm install -g mocha
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
