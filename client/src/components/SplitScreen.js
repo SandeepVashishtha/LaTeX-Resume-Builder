@@ -1,54 +1,65 @@
 import React, { useState } from 'react';
-import Latex from 'react-latex'; // Ensure this import works
-import { renderToStaticMarkup } from 'react-dom/server';
+import { jsPDF } from 'jspdf';
+import 'katex/dist/katex.min.css';
+import { BlockMath } from 'react-katex';
+import katex from 'katex';
 
 const SplitScreen = () => {
-    const [latexCode, setLatexCode] = useState(''); // State to hold LaTeX code
+    const [latexCode, setLatexCode] = useState('');
 
-    const handleChange = (event) => {
-        setLatexCode(event.target.value); // Update state on change
+    const handleInputChange = (event) => {
+        setLatexCode(event.target.value);
     };
 
-    const handleGeneratePDF = () => {
-        fetch('http://localhost:5000/generate-pdf', { // Ensure this matches your backend URL
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ code: latexCode }),
-        })
-        .then(response => response.blob())
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'resume.pdf'; // Set the desired file name
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        })
-        .catch(error => {
-            console.error('Error generating PDF:', error);
-        });
+    const generatePDF = () => {
+        const doc = new jsPDF();
+        const element = document.createElement('div');
+        element.style.width = '100%';
+        element.style.margin = '20px';
+
+        // Render LaTeX to HTML using KaTeX
+        try {
+            const renderedHTML = katex.renderToString(latexCode, {
+                throwOnError: false,
+            });
+            element.innerHTML = renderedHTML;
+
+            // Add HTML content to PDF
+            doc.html(element, {
+                callback: () => {
+                    doc.save('resume.pdf');
+                },
+                x: 10,
+                y: 10,
+            });
+        } catch (error) {
+            console.error("Error rendering LaTeX:", error);
+        }
     };
 
     return (
-        <div style={{ display: 'flex', height: '100vh' }}>
-            <div style={{ flex: 1, padding: '10px' }}>
-                <h2>LaTeX Editor</h2>
+        <div className="flex h-screen">
+            <div className="flex-1 p-4 overflow-y-auto">
+                <h2 className="text-xl font-bold mb-2">LaTeX Editor</h2>
                 <textarea
-                    style={{ width: '100%', height: '100%' }}
+                    className="w-full h-full p-2 border rounded resize-none overflow-hidden"
                     value={latexCode}
-                    onChange={handleChange}
-                    placeholder="Write your LaTeX code here..."
+                    onChange={handleInputChange}
+                    placeholder="Enter your LaTeX code here..."
                 />
-                <button onClick={handleGeneratePDF}>Generate PDF</button> {/* Add this button */}
             </div>
-            <div style={{ flex: 1, padding: '10px', borderLeft: '1px solid #ccc' }}>
-                <h2>Live Preview</h2>
-                <div>
-                    <Latex>{latexCode}</Latex> {/* Render the LaTeX code */}
+            
+            <div className="flex-1 p-4 border-r overflow-y-auto">
+                <h2 className="text-xl font-bold mb-2">Live Preview</h2>
+                <div className="latex-preview p-4 border rounded h-full overflow-hidden whitespace-normal break-words">
+                    <BlockMath>{latexCode}</BlockMath>
                 </div>
+                <button
+                    onClick={generatePDF}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                >
+                    Download PDF
+                </button>
             </div>
         </div>
     );
