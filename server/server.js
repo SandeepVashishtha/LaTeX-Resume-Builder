@@ -3,7 +3,8 @@ const cors = require('cors');
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-
+const connectDB = require('./db/index.js');
+const authRouter = require("./routes/auth-routes.js")
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -45,6 +46,12 @@ app.post('/generate-pdf', (req, res) => {
     });
 });
 
+// Connection to DB:
+connectDB();
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+// Use the below route to use the auth feature
+app.use("/api/v1/auth", authRouter);
