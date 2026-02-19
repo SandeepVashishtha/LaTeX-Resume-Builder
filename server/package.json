@@ -11,7 +11,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "mocha": "^9.0.0"
+    "mocha": "^11.7.5"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
